@@ -156,6 +156,7 @@ export const oauthLogin = async (req: Request, res: Response) => {
         // Try to find user by oauth_id (Google sub)
         let user = await User.findOne({ where: { oauthId: sub } });
 
+        let isNewUser = false;
         if (!user) {
             // Create user only once if not found
             user = await User.create({
@@ -164,10 +165,16 @@ export const oauthLogin = async (req: Request, res: Response) => {
                 oauthId: sub,
                 user_type: 'patient',
             });
+            isNewUser = true;
         }
 
         if (!user) {
             return res.status(500).json({ message: "User creation failed, please try again." });
+        }
+
+        // Send confirmation email for new users
+        if (isNewUser) {
+            await sendConfirmationEmail(user.email, user.name);
         }
 
         const incompleteProfile = !user.phone || !user.dob || !user.city;
