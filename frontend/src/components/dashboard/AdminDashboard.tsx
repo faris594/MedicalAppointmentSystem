@@ -26,14 +26,19 @@ export default function AdminDashboard({ userData }: AdminDashboardProps) {
             {/* Main Content */}
             <main className="flex-1 py-10 px-4 flex justify-center">
                 <div className="w-full max-w-5xl space-y-12">
+                    {/* User Info (Moved Up) */}
+                    <div>
+                        <UserInfo userData={userData} />
+                    </div>
+
                     {/* Welcome */}
                     <div className="text-center">
                         <h2 className="text-3xl font-semibold text-teal-700 mb-2">Welcome, Admin</h2>
-                        <p className="text-gray-600">Manage users, appointments, and system settings below.</p>
+                        <p className="text-gray-600">Manage users and appointments below.</p>
                     </div>
 
-                    {/* Button Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                    {/* Button Grid (Reorganized) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 w-full">
                         <SectionButton
                             label="Create Doctor"
                             backgroundImage="/images/CreateIcon.png"
@@ -54,21 +59,6 @@ export default function AdminDashboard({ userData }: AdminDashboardProps) {
                             backgroundImage="/images/ScheduleIcon.png"
                             onClick={() => router.push('/admin/manage-appointments')}
                         />
-                        <SectionButton
-                            label="Reports"
-                            backgroundImage="/images/ReportIcon.png"
-                            onClick={() => router.push('/admin/reports')}
-                        />
-                        <SectionButton
-                            label="System Settings"
-                            backgroundImage="/images/SettingsIcon.png"
-                            onClick={() => router.push('/admin/settings')}
-                        />
-                    </div>
-
-                    {/* User Info */}
-                    <div>
-                        <UserInfo userData={userData} />
                     </div>
                 </div>
             </main>

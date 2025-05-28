@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import UserInfo from './UserInfo';
+import { UserInfo } from '../dashboard/UserInfo';
 import LogoutButton from './dashboard/LogoutButton';
 import { FaHome, FaClock, FaCalendarAlt, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
 

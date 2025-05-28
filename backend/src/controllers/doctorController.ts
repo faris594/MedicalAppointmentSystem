@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { Doctor } from '../models/Doctor';
 import { User } from '../models/User';
 
-// GET /api/auth/doctors - list of all doctors
 export const getDoctors = async (req: Request, res: Response) => {
     try {
         const doctors = await Doctor.findAll({
@@ -33,7 +32,6 @@ export const getDoctors = async (req: Request, res: Response) => {
     }
 };
 
-// GET /api/auth/doctors/:id - full profile of one doctor
 export const getDoctorById = async (req: Request, res: Response) => {
     const { id } = req.params;
 
