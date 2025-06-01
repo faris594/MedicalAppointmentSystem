@@ -5,6 +5,7 @@ import { Doctor } from './Doctor'; // Import the Doctor model
     tableName: 'users',
     timestamps: true,
 })
+
 export class User extends Model<User> {
     @PrimaryKey
     @AutoIncrement

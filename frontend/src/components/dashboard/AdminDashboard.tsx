@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
 import UserInfo from './UserInfo';
-import LogoutButton from './LogoutButton';
 import AdminHeader from '../sidebar/AdminHeader';
 
 interface AdminDashboardProps {
@@ -33,7 +32,7 @@ export default function AdminDashboard({ userData }: AdminDashboardProps) {
 
                     {/* Welcome */}
                     <div className="text-center">
-                        <h2 className="text-3xl font-semibold text-teal-700 mb-2">Welcome, Admin</h2>
+                        <h2 className="text-3xl font-semibold text-red-700 mb-2">Welcome, Admin</h2>
                         <p className="text-gray-600">Manage users and appointments below.</p>
                     </div>
 

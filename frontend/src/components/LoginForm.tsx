@@ -42,7 +42,6 @@ export default function LoginForm() {
     const handleGoogleSuccess = async (credentialResponse: any) => {
         const { credential } = credentialResponse;
         if (!credential) return;
-
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/oauth-login`, {
                 method: "POST",
@@ -75,7 +74,7 @@ export default function LoginForm() {
 
     return (
         <GoogleOAuthProvider clientId="860397823266-d8k4j7v6o413fbqlrfipj46eugdqhnps.apps.googleusercontent.com">
-            <div className="flex justify-center items-center h-screen bg-gradient-to-br from-teal-600 to-teal-900">
+            <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-500 to-teal-600">
                 <div className="w-full max-w-4xl justify-center bg-gray-200 rounded-lg shadow-xl p-8 flex flex-col md:flex-row">
                     <div className="w-full md:w-1/2 p-6">
                         <div className="flex items-center mb-6">

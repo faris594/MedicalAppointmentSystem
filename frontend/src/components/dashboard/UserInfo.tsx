@@ -24,7 +24,7 @@ export default function UserInfo({ userData }: UserInfoProps) {
         : 'https://api.dicebear.com/7.x/notionists/svg';
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-lg flex items-center space-x-6">
+        <div className="bg-gray-200 p-6 rounded-lg shadow-lg flex items-center space-x-6">
             <img
                 src={avatarUrl}
                 alt="User Profile"

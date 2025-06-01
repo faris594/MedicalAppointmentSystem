@@ -43,7 +43,6 @@ router.put('/appointment/:id', authenticateToken, updateAppointment);
 router.delete('/appointment/:id', authenticateToken, deleteAppointment);
 router.patch('/appointment/:id/status', authenticateToken, updateAppointmentStatus);
 
-
 // New Doctor route
 router.get('/doctors', authenticateToken, getDoctors);
 router.get('/doctors/:id', authenticateToken, getDoctorById);

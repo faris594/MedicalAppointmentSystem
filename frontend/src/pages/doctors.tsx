@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { FaHome, FaUserMd, FaQuestionCircle, FaLifeRing, FaUserCircle } from 'react-icons/fa';
-import UserInfo from '../components/dashboard/UserInfo';
-import LogoutButton from '../components/dashboard/LogoutButton';
 import axios from 'axios';
+import PatientSidebar from '../components/sidebar/PatientSidebar';
 
 interface Doctor {
     id: number;
@@ -55,32 +53,7 @@ export default function DoctorsPage() {
 
     return (
         <div className="flex min-h-screen bg-gray-50">
-            {/* Sidebar */}
-            <aside className="w-64 bg-gradient-to-b from-gray-900 to-teal-600 p-6 shadow-xl text-white flex flex-col">
-                <div className="flex items-center mb-10">
-                    <img src="/images/logo.svg" alt="Logo" className="w-10 h-10 mr-3" />
-                    <h1 className="text-2xl font-bold tracking-wide">HealthCare</h1>
-                </div>
-
-                {userData?.email && (
-                    <div className="mb-8 text-sm text-gray-200">
-                        <p>Welcome,</p>
-                        <p className="font-semibold">{userData.email}</p>
-                    </div>
-                )}
-
-                <nav className="flex-1 space-y-4">
-                    <SidebarLink href="/dashboard" icon={<FaHome />} label="Dashboard" />
-                    <SidebarLink href="/doctors" icon={<FaUserMd />} label="Doctors" />
-                    <SidebarLink href="/profile" icon={<FaUserMd />} label="Profile" />
-                    <SidebarLink href="/faq" icon={<FaQuestionCircle />} label="FAQ" />
-                    <SidebarLink href="/support" icon={<FaLifeRing />} label="Support" />
-                </nav>
-
-                <div className="mt-auto">
-                    <LogoutButton />
-                </div>
-            </aside>
+            <PatientSidebar email={userData?.email} />
 
             {/* Main Content */}
             <main className="flex-1 p-8">

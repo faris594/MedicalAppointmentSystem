@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { UserInfo } from '../dashboard/UserInfo';
-import LogoutButton from './dashboard/LogoutButton';
-import { FaHome, FaClock, FaCalendarAlt, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import { FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import DoctorSidebar from '../components/sidebar/DoctorSidebar';
 
 // Interfaces for type safety
 interface UserData {
@@ -309,69 +308,8 @@ export default function Schedule({ userData }: ScheduleProps) {
         <div className="flex min-h-screen bg-gray-100">
             <ToastContainer position="top-right" autoClose={2000} />
 
-            {/* Sidebar */}
-            <aside
-                className={`fixed inset-y-0 left-0 w-64 bg-gradient-to-br from-gray-800 to-teal-500 p-6 shadow-md transform transition-transform duration-300 z-50 ${
-                    isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                } md:relative md:translate-x-0 md:w-64`}
-            >
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center">
-                        <img src="/images/logo.svg" alt="Health Care Logo" className="w-12 h-12 mr-3" />
-                        <h1 className="text-2xl font-bold text-teal-100">Health Care</h1>
-                    </div>
-                    <button
-                        className="md:hidden text-teal-100"
-                        onClick={() => setIsSidebarOpen(false)}
-                        aria-label="Close sidebar"
-                    >
-                        ✕
-                    </button>
-                </div>
+            <DoctorSidebar userData={userData} />
 
-                {userData?.email && (
-                    <div className="mb-6">
-                        <p className="text-sm text-teal-100 opacity-90">Welcome, {userData.email}</p>
-                    </div>
-                )}
-
-                <ul className="space-y-3 flex-1">
-                    <li>
-                        <a
-                            href="/dashboard"
-                            className="flex items-center p-3 rounded-lg hover:bg-teal-600 transition-colors"
-                            aria-label="Go to Dashboard"
-                        >
-                            <FaHome className="mr-3 text-xl" />
-                            <span>Home</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a
-                            href="/schedule"
-                            className="flex items-center p-3 rounded-lg bg-teal-600 text-teal-100"
-                            aria-label="Go to Schedule"
-                        >
-                            <FaClock className="mr-3 text-xl" />
-                            <span>Schedule</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a
-                            href="/support"
-                            className="flex items-center p-3 rounded-lg hover:bg-teal-600 transition-colors"
-                            aria-label="Go to Support"
-                        >
-                            <FaCalendarAlt className="mr-3 text-xl" />
-                            <span>Support</span>
-                        </a>
-                    </li>
-                </ul>
-
-                <div className="mt-auto">
-                    <LogoutButton />
-                </div>
-            </aside>
 
             {/* Main Content */}
             <main className="flex-1 p-6 overflow-y-auto bg-gray-50 relative">

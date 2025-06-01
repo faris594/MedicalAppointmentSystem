@@ -72,7 +72,6 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const sendConfirmationEmail = async (to: string, name: string) => {
-    // Transporter using Gmail (use environment variables in production!)
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
