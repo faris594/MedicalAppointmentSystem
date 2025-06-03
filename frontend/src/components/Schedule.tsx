@@ -15,6 +15,7 @@ interface UserData {
     city?: string;
 }
 
+
 interface Appointment {
     id: number;
     doctorId: number;
@@ -111,19 +112,30 @@ export default function Schedule({ userData }: ScheduleProps) {
 
     // Fetch schedule and appointments
     useEffect(() => {
-        const fetchSchedule = async () => {
+        const fetchDoctorData = async () => {
             if (!userData?.id) return;
             setLoading(true);
             try {
                 const token = localStorage.getItem('token');
                 if (!token) throw new Error('No authentication token found');
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/schedule/doctor/${userData.id}`, {
+
+                // Step 1: Fetch profile to get doctorId
+                const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                const data = await response.json();
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        // No schedule found, initialize empty schedule
+                const profileData = await profileRes.json();
+                const doctorId = profileData.doctor?.id;
+
+                if (!doctorId) throw new Error('Doctor ID not found in profile');
+
+                // Step 2: Fetch schedule using doctorId
+                const scheduleRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/schedule/doctor/${doctorId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                const scheduleData = await scheduleRes.json();
+
+                if (!scheduleRes.ok) {
+                    if (scheduleRes.status === 404) {
                         setSelectedDays([]);
                         setStartHour('08');
                         setStartMinute('00');
@@ -131,47 +143,39 @@ export default function Schedule({ userData }: ScheduleProps) {
                         setEndHour('05');
                         setEndMinute('00');
                         setEndPeriod('PM');
-                        return;
+                    } else {
+                        throw new Error(scheduleData.message || 'Error fetching schedule');
                     }
-                    throw new Error(data.message || 'Error fetching schedule');
+                } else {
+                    setSelectedDays(scheduleData.availableDays || []);
+                    setStartHour(scheduleData.startHour || '08');
+                    setStartMinute(scheduleData.startMinute || '00');
+                    setStartPeriod(scheduleData.startPeriod || 'AM');
+                    setEndHour(scheduleData.endHour || '05');
+                    setEndMinute(scheduleData.endMinute || '00');
+                    setEndPeriod(scheduleData.endPeriod || 'PM');
                 }
-                setSelectedDays(data.availableDays || []);
-                setStartHour(data.startHour || '08');
-                setStartMinute(data.startMinute || '00');
-                setStartPeriod(data.startPeriod || 'AM');
-                setEndHour(data.endHour || '05');
-                setEndMinute(data.endMinute || '00');
-                setEndPeriod(data.endPeriod || 'PM');
-            } catch (error) {
-                console.error('Fetch schedule failed:', error);
-                toast.error(error.message || 'Failed to load schedule');
-            } finally {
-                setLoading(false);
-            }
-        };
 
-        const fetchAppointments = async () => {
-            if (!userData?.id) return;
-            setLoading(true);
-            try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/doctor/${userData.id}`, {
+                // Step 3: Fetch appointments using doctorId
+                const appointmentsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/doctor/${doctorId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message || 'Error fetching appointments');
-                setAppointments(data || []);
+                const appointmentsData = await appointmentsRes.json();
+                if (!appointmentsRes.ok) {
+                    throw new Error(appointmentsData.message || 'Error fetching appointments');
+                }
+                setAppointments(appointmentsData || []);
             } catch (error) {
-                console.error('Fetch appointments failed:', error);
-                toast.error('Failed to load appointments');
+                console.error('Doctor data fetch failed:', error);
+                toast.error(error.message || 'Failed to load doctor data');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchSchedule();
-        fetchAppointments();
+        fetchDoctorData();
     }, [userData?.id]);
+
 
     // Save schedule
     const handleSave = async () => {

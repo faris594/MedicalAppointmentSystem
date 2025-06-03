@@ -269,8 +269,8 @@ export const getUserProfile = async (req: Request, res: Response) => {
             include: [
                 {
                     model: Doctor,
-                    as: 'doctor', // Matches the default alias from BelongsTo
-                    attributes: ['specialty', 'description'],
+                    as: 'doctor',
+                    attributes: ['id', 'specialty', 'description'], // include 'id' here
                 },
             ],
         });

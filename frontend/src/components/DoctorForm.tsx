@@ -19,7 +19,8 @@ export default function DoctorForm({ onSubmit }: DoctorFormProps) {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
-
+    
+    // Validation function
     const validate = () => {
         const { name, email, phone, specialty } = formData;
         if (!name || !email || !phone || !specialty) return 'All fields are required.';

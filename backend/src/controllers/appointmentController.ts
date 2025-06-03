@@ -280,8 +280,15 @@ export const updateAppointmentStatus = async (req: AuthenticatedRequest, res: Re
             return res.status(404).json({ message: 'Appointment not found' });
         }
 
-        // Check if the authenticated user is the doctor for this appointment
-        if (req.user && req.user.id !== appointment.doctorId) {
+        // Find doctor profile based on logged-in user's ID
+        const doctorProfile = await Doctor.findOne({ where: { userId: req.user?.id } });
+
+        if (!doctorProfile) {
+            return res.status(403).json({ message: 'Doctor profile not found' });
+        }
+
+        // Check if this doctor is assigned to the appointment
+        if (doctorProfile.id !== appointment.doctorId) {
             return res.status(403).json({ message: 'Unauthorized to update this appointment' });
         }
 

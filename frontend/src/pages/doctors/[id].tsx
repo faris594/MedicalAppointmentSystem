@@ -56,11 +56,13 @@ export default function DoctorProfile() {
     const [appointmentDate, setAppointmentDate] = useState('');
     const [appointmentTime, setAppointmentTime] = useState('');
 
+
     // Ensure router is ready before reading query param
     useEffect(() => {
         if (!router.isReady) return;
 
         const doctorId = router.query.id;
+        console.log('Doctor ID from query:', doctorId);
 
         if (!doctorId || Array.isArray(doctorId)) {
             setError('Invalid doctor ID');
@@ -73,16 +75,16 @@ export default function DoctorProfile() {
                 const token = localStorage.getItem('token');
                 if (!token) throw new Error('No authentication token found');
 
-                // Fetch user profile
                 const userResponse = await axios.get('http://localhost:8080/api/auth/profile', {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                console.log('User data:', userResponse.data); // Debug patient data
                 setUserData(userResponse.data);
 
-                // Fetch doctor profile
                 const doctorResponse = await axios.get(`http://localhost:8080/api/auth/doctors/${doctorId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                console.log('Doctor data:', doctorResponse.data); // Debug doctor data
                 setDoctor(doctorResponse.data);
             } catch (err) {
                 console.error('Error fetching profile:', err);
@@ -144,26 +146,20 @@ export default function DoctorProfile() {
             return;
         }
 
-        // Client-side validation against schedule
-        if (schedule) {
-            const selectedDay = new Date(appointmentDate).toLocaleString('en-US', { weekday: 'long' });
+        // Client-side validation against schedule days and hours
+        const selectedDay = new Date(appointmentDate).toLocaleString('en-US', { weekday: 'long' });
+        if (!schedule.availableDays.includes(selectedDay)) {
+            setBookingMessage(`Doctor is not available on ${selectedDay}.`);
+            return;
+        }
 
-            if (!schedule.availableDays.includes(selectedDay)) {
-                setBookingMessage(`Doctor is not available on ${selectedDay}.`);
-                return;
-            }
-
-            const [selHour, selMinute] = appointmentTime.split(':').map(Number);
-
-            // Convert both to 24-hour format for comparison
-            const start24 = convertTo24Hour(schedule.startHour, schedule.startMinute, schedule.startPeriod);
-            const end24 = convertTo24Hour(schedule.endHour, schedule.endMinute, schedule.endPeriod);
-            const selected = selHour * 60 + selMinute;
-
-            if (selected < start24 || selected > end24) {
-                setBookingMessage(`Selected time is outside the doctor’s working hours.`);
-                return;
-            }
+        const [selHour, selMinute] = appointmentTime.split(':').map(Number);
+        const start24 = convertTo24Hour(schedule.startHour, schedule.startMinute, schedule.startPeriod);
+        const end24 = convertTo24Hour(schedule.endHour, schedule.endMinute, schedule.endPeriod);
+        const selectedMinutes = selHour * 60 + selMinute;
+        if (selectedMinutes < start24 || selectedMinutes >= end24) {
+            setBookingMessage(`Selected time is outside the doctor’s working hours.`);
+            return;
         }
 
         setBookingLoading(true);
@@ -173,6 +169,30 @@ export default function DoctorProfile() {
             const token = localStorage.getItem('token');
             if (!token || !userData || !doctor) throw new Error('Missing user or doctor info');
 
+            // Step 1: Fetch existing appointments for this doctor and date
+            const response = await axios.get(`http://localhost:8080/api/auth/appointments`, {
+                params: { doctorId: doctor.id, date: appointmentDate },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const existingAppointments = response.data; // assume array of appointments with time field
+
+            // Step 2: Check for overlap (assuming 1-hour slots)
+            const selectedStart = new Date(`${appointmentDate}T${appointmentTime}:00`).getTime();
+            const selectedEnd = selectedStart + 60 * 60 * 1000;
+
+            const overlap = existingAppointments.some(appt => {
+                const apptStart = new Date(`${appt.date}T${appt.time}:00`).getTime();
+                const apptEnd = apptStart + 60 * 60 * 1000;
+                return selectedStart < apptEnd && selectedEnd > apptStart;
+            });
+
+            if (overlap) {
+                setBookingMessage('Selected time overlaps with an existing appointment. Please choose another time.');
+                setBookingLoading(false);
+                return;
+            }
+
+            // Step 3: Proceed to book since no overlap
             await axios.post(
                 'http://localhost:8080/api/auth/appointment',
                 {
@@ -198,13 +218,11 @@ export default function DoctorProfile() {
             console.error('Booking error:', err);
             if (axios.isAxiosError(err)) {
                 const serverMessage = err.response?.data?.message;
-                if (serverMessage?.includes("outside doctor's schedule")) {
-                    setBookingMessage('Selected time is outside the doctor’s available hours. Please pick a different time.');
+                if (serverMessage) {
+                    setBookingMessage(serverMessage); // show detailed message like overlap
                 } else {
                     setBookingMessage('Booking failed. Please check the inputs and try again.');
                 }
-            } else {
-                setBookingMessage('Something went wrong. Please try again later.');
             }
         } finally {
             setBookingLoading(false);

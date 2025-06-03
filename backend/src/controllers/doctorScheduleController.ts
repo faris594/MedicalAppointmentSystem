@@ -49,7 +49,6 @@ export const createOrUpdateSchedule = async (req: Request, res: Response) => {
 };
 
 
-
 export const getScheduleByDoctor = async (req: Request, res: Response) => {
     try {
         const user = req.user;
